@@ -1,0 +1,85 @@
+ROLE: Senior Fullstack Engineer (React, Tailwind) + UI/UX Designer + QA Engineer
+
+PROJECT: Kelas Sukma - Bimbingan Belajar SKD CPNS Online, target anak muda 20-28 tahun, nuansa semangat lolos CPNS, colourful tapi profesional clean.
+
+TECH STACK:
+- Single file React (App.tsx) dengan Tailwind CSS
+- State: useState + useEffect + localStorage (tanpa backend)
+- File upload: FileReader base64, max 2MB
+- Deploy: single index.html siap push GitHub + Cloudflare Pages
+
+=== DESIGN SYSTEM - CLEAN FINAL (TANPA EMBEL TEKNIS) ===
+- Warna: Primary violet #7C3AED, Secondary blue, background putih bersih
+- Radius: 16-24px rounded, shadow soft 3D
+- Font: Inter / Poppins clean
+- TIDAK ADA tulisan teknis di user-facing: jangan ada kata "Shiny", "Glassmorphism", "Encrypted", "Hash", "Verified BKN", "Ex-BKN Verified"
+- Footer clean: "© 2026 Kelas Sukma - Bimbingan Belajar SKD CPNS Terpercaya"
+- Ikon pakai emoji 3D besar (🎓 🛡️ 🏆 📚 ⏱️) dengan drop-shadow, lucu tapi profesional
+
+=== LANDING PAGE ===
+1. Navbar: Logo (ambil dari localStorage 'sukma_logo' jika ada, jika tidak text "Kelas Sukma") + Menu: Beranda, Program, Try Out, Peringkat, Video + Tombol Login Member & Login Admin
+2. Hero: Judul besar "Wujudkan NIP Impianmu Bersama Kelas Sukma", subjudul semangat, foto sampul hero (ambil dari localStorage 'sukma_sampul' jika ada), CTA "Mulai Try Out Gratis" + "Lihat Program"
+3. Program: 3 card
+   - Basic 299K: 12x Zoom, 6x Try Out, Group WA, Materi SKD update 2025
+   - Intensif 599K: 24x Zoom, 12x Try Out, 1x Privat, Bedah Soal
+   - Privat 3jt: 40x Privat 1-on-1, Garansi sampai lolos, Modul eksklusif
+4. Visi Misi: Visi "Menjadi bimbel paling berdampak", 3 misi + foto founder (ambil dari 'sukma_founder')
+5. Founder: Card foto bulat, nama "Sukma Wijaya, S.Pd, M.Pd - Founder & Head Mentor", bio "8 tahun pengalaman mentoring CPNS" (TANPA Verified BKN)
+6. Testimoni, FAQ, Footer clean
+
+=== AUTH & MEMBER ===
+- Modal Daftar: Nama, Email, Password, Pilih Program (Basic/Intensif/Privat) -> simpan ke localStorage 'sukma_users' status pending
+- Modal Login Member: Email + Password -> cek di sukma_users status active, jika pending alert "Menunggu approval admin"
+- Modal Login Admin: Username admin, Password admin123 + link kecil "Lupa Password? Klik Reset" -> reset localStorage ke admin/admin123
+- Akun Demo Active (sudah ada):
+  basic@test.com / 123456 (akses Paket 1-6)
+  intensif@test.com / 123456 (akses 1-12)
+  privat@test.com / 123456 (akses 1-20)
+- Admin: admin / admin123
+- Keamanan: password hash simple + rate limit login 5x salah block 5 menit (simpan di localStorage 'login_attempts')
+
+=== TRY OUT SYSTEM ===
+- Try Out Gratis: 15 soal (5 TWK, 5 TIU dengan gambar, 5 TKP), timer CAT BKN 20 menit, pilih jawaban A-E, submit -> skor per kategori + pembahasan + simpan ke leaderboard
+- TIU Bergambar: 5 soal TIU wajib ada gambar, gambar dari sistem upload file (base64) bukan link
+- Paket 1-20: Tiap paket 110 soal (30 TWK, 35 TIU dengan 5 bergambar, 45 TKP), akses sesuai role member, lock jika tidak punya akses tampilkan "Upgrade Program"
+- Leaderboard Peringkat: filter per paket, tampil nama, skor TWK TIU TKP total, waktu pengerjaan
+- Video Pembelajaran: list video, admin tambah link YouTube + judul
+- Kalkulator SKD: input skor TWK TIU TKP -> prediksi lolos + passing grade
+
+=== ADMIN DASHBOARD ===
+Sidebar: Dashboard, Kelola Member, Kelola Try Out Gratis, Kelola Paket 1-20, Peringkat, Video, Kalkulator, Pengaturan Global, Logout
+
+1. Dashboard: Statistik member, total try out dikerjakan, grafik
+2. Kelola Member: Table nama email program status (pending/active/ban) + aksi Approve, Ban, Edit, Hapus, Export CSV
+3. Kelola Try Out Gratis: CRUD soal, kategori TWK/TIU/TKP, form: Pertanyaan, Opsi A-E, Kunci, Pembahasan, Upload Gambar (untuk TIU) -> input file bukan link, preview base64
+4. Kelola Paket 1-20: Pilih paket 1-20, CRUD 110 soal per paket, sama seperti try out gratis
+5. Pengaturan Global (ANTI BLANK - WAJIB MUNCUL):
+   - Component anti-crash dengan try-catch JSON.parse
+   - Section Identitas: Nama Website, Tagline, Alamat, WA, Email (input text biasa)
+   - Section Foto & Logo (4 Upload System BUKAN LINK):
+     * Foto Sampul Hero
+     * Foto Founder
+     * Logo Website
+     * Logo Footer
+     Tiap foto: kotak dashed border violet, preview img jika ada, tulisan "Klik untuk upload", input type="file" accept="image/*" hidden + label "Pilih Foto", logic FileReader base64 -> setState -> localStorage.setItem('sukma_sampul' etc) -> toast "Foto berhasil diupload!", tombol Hapus clear state + localStorage
+     Validasi max 2MB
+   - Section Visi Misi & Founder: textarea Visi, input Nama Founder, textarea Bio Founder
+   - Section Warna Tema: 10 lingkaran warna 56px (#7C3AED, #2563EB, #10B981, #F97316, #F43F5E, #0F172A, #14B8A6, #9333EA, #0891B2, #EC4899) klik -> setProperty --primary + localStorage
+   - Tombol Simpan Semua Perubahan (bg violet) -> simpan JSON ke localStorage 'sukma_global' + toast, dan Reset Default clear localStorage
+   - Landing page ambil foto dari localStorage key tersebut untuk tampil real-time
+
+=== KELAYAKAN & ANTI ERROR ===
+- Semua localStorage pakai try-catch, fallback default value jika parse error
+- Semua render pakai optional chaining (data?.programs || {})
+- Semua gambar pakai base64 atau placeholder picsum.photos, jangan URL eksternal yang bisa 404
+- Semua state ada initial value tidak undefined
+- Toast notifikasi sukses/gagal tiap aksi pakai alert atau custom toast
+- Responsive mobile: modal jadi bottom sheet, grid jadi 1 kolom
+
+=== LARANGAN ===
+- Jangan ada input link URL untuk foto, semua harus upload file
+- Jangan ada tulisan "Verified Mentor BKN", "Verified", "Ex-BKN Verified", "Encrypted", "Hash"
+- Jangan ada badge teknis di user-facing
+- Jangan pakai icon yang tidak di-import yang bikin blank
+
+OUTPUT: Single file App.tsx / index.html yang 100% berfungsi, Global Setting muncul tidak blank, semua upload file jalan, login admin/member jalan, try out jalan, siap deploy.
